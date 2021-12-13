@@ -23,9 +23,6 @@
                     "Shopware\\Core\\Checkout\\Checkout": [
                         "all"
                     ],
-                    "Shopware\\Core\\Profiling\\Profiling": [
-                        "dev"
-                    ],
                     "Shopware\\Core\\Maintenance\\Maintenance": [
                         "all"
                     ]
@@ -284,6 +281,12 @@
                         ""
                     ],
                     "executable": true
+                },
+                "config/jwt/.gitkeep": {
+                    "contents": [
+                        ""
+                    ],
+                    "executable": false
                 },
                 "config/services.xml": {
                     "contents": [
@@ -808,7 +811,7 @@
                     "executable": false
                 }
             },
-            "ref": "aa6432c7257de756134d5c9e297663ced02e3db6"
+            "ref": "aa20ef9ec3e97eacd7158b101a818eb4d08e53d4"
         }
     }
 }
