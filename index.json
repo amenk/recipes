@@ -12,6 +12,9 @@
         ],
         "shopware/storefront": [
             "6.4"
+        ],
+        "sroze/messenger-enqueue-transport": [
+            "0.4"
         ]
     },
     "versions": [],
