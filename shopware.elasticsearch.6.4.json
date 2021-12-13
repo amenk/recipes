@@ -1,0 +1,21 @@
+{
+    "manifests": {
+        "shopware/elasticsearch": {
+            "manifest": {
+                "bundles": {
+                    "Shopware\\Elasticsearch\\Elasticsearch": [
+                        "all"
+                    ]
+                },
+                "env": {
+                    "SHOPWARE_ES_HOSTS": "localhost",
+                    "SHOPWARE_ES_ENABLED": "0",
+                    "SHOPWARE_ES_INDEXING_ENABLED": "0",
+                    "SHOPWARE_ES_INDEX_PREFIX": "sw"
+                }
+            },
+            "files": [],
+            "ref": "093f000be4ea1757157c1668dc2391b17469beb5"
+        }
+    }
+}

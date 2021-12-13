@@ -31,6 +31,7 @@
                     ]
                 },
                 "env": {
+                    "APP_ENV": "prod",
                     "APP_URL": "http://localhost",
                     "APP_SECRET": "%generate(secret)%",
                     "INSTANCE_ID": "%generate(secret)%",
@@ -65,7 +66,25 @@
                     "/var/*",
                     "!/var/log/.gitkeep",
                     "!/var/cache/.gitkeep"
-                ]
+                ],
+                "composer-scripts": {
+                    "pre-install-cmd": [
+                        "[ ! -f vendor/autoload.php ] || $PHP_BINARY bin/console system:update:prepare"
+                    ],
+                    "pre-update-cmd": [
+                        "[ ! -f vendor/autoload.php ] || $PHP_BINARY bin/console system:update:prepare"
+                    ],
+                    "post-install-cmd": [
+                        "@composer install --working-dir vendor/shopware/recovery --no-interaction --no-scripts",
+                        "@composer install --working-dir=vendor/shopware/recovery/Common --no-interaction --optimize-autoloader --no-suggest",
+                        "[ ! -f vendor/autoload.php ] || $PHP_BINARY bin/console system:update:finish"
+                    ],
+                    "post-update-cmd": [
+                        "@composer install --working-dir vendor/shopware/recovery --no-interaction --no-scripts",
+                        "@composer install --working-dir=vendor/shopware/recovery/Common --no-interaction --optimize-autoloader --no-suggest",
+                        "[ ! -f vendor/autoload.php ] || $PHP_BINARY bin/console system:update:finish"
+                    ]
+                }
             },
             "files": {
                 "bin/.htaccess": {
@@ -85,60 +104,6 @@
                     ],
                     "executable": false
                 },
-                "bin/build-administration.sh": {
-                    "contents": [
-                        "#!/usr/bin/env bash",
-                        "",
-                        "CWD=\"$(cd -P -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd -P)\"",
-                        "",
-                        "set -e",
-                        "",
-                        "export PROJECT_ROOT=\"${PROJECT_ROOT:-\"$(dirname \"$CWD\")\"}\"",
-                        "ADMIN_ROOT=\"${ADMIN_ROOT:-\"${PROJECT_ROOT}/vendor/shopware/administration\"}\"",
-                        "",
-                        "BIN_TOOL=\"${CWD}/console\"",
-                        "",
-                        "if [[ ${CI} ]]; then",
-                        "    BIN_TOOL=\"${CWD}/ci\"",
-                        "    chmod +x \"$BIN_TOOL\"",
-                        "fi",
-                        "",
-                        "# build admin",
-                        "[[ ${SHOPWARE_SKIP_BUNDLE_DUMP} ]] || \"${BIN_TOOL}\" bundle:dump",
-                        "",
-                        "if [[ $(command -v jq) ]]; then",
-                        "    OLDPWD=$(pwd)",
-                        "    cd \"$PROJECT_ROOT\" || exit",
-                        "",
-                        "    jq -c '.[]' \"var/plugins.json\" | while read -r config; do",
-                        "        srcPath=$(echo \"$config\" | jq -r '(.basePath + .administration.path)')",
-                        "",
-                        "        # the package.json files are always one upper",
-                        "        path=$(dirname \"$srcPath\")",
-                        "        name=$(echo \"$config\" | jq -r '.technicalName' )",
-                        "",
-                        "        if [[ -f \"$path/package.json\" && ! -f \"$path/node_modules\" && $name != \"administration\" ]]; then",
-                        "            echo \"=> Installing npm dependencies for ${name}\"",
-                        "",
-                        "            if [[ -f \"$path/package-lock.json\" ]]; then",
-                        "                npm clean-install --prefix \"$path\"",
-                        "            else",
-                        "                npm install --prefix \"$path\"",
-                        "            fi",
-                        "        fi",
-                        "    done",
-                        "    cd \"$OLDPWD\" || exit",
-                        "else",
-                        "    echo \"Cannot check extensions for required npm installations as jq is not installed\"",
-                        "fi",
-                        "",
-                        "(cd \"${ADMIN_ROOT}\"/Resources/app/administration && npm clean-install && npm run build)",
-                        "[[ ${SHOPWARE_SKIP_ASSET_COPY} ]] ||\"${BIN_TOOL}\" asset:install",
-                        "",
-                        ""
-                    ],
-                    "executable": true
-                },
                 "bin/build-js.sh": {
                     "contents": [
                         "#!/usr/bin/env bash",
@@ -147,65 +112,14 @@
                         "",
                         "set -e",
                         "",
-                        "\"${BIN_DIR}/build-administration.sh\"",
-                        "\"${BIN_DIR}/build-storefront.sh\"",
-                        ""
-                    ],
-                    "executable": true
-                },
-                "bin/build-storefront.sh": {
-                    "contents": [
-                        "#!/usr/bin/env bash",
                         "",
-                        "CWD=\"$(cd -P -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd -P)\"",
-                        "",
-                        "set -e",
-                        "",
-                        "export PROJECT_ROOT=\"${PROJECT_ROOT:-\"$(dirname \"$CWD\")\"}\"",
-                        "STOREFRONT_ROOT=\"${STOREFRONT_ROOT:-\"${PROJECT_ROOT}/vendor/shopware/storefront\"}\"",
-                        "",
-                        "BIN_TOOL=\"${CWD}/console\"",
-                        "",
-                        "if [[ ${CI} ]]; then",
-                        "    BIN_TOOL=\"${CWD}/ci\"",
-                        "    chmod +x \"$BIN_TOOL\"",
+                        "if [[ -e \"${BIN_DIR}/build-administration.sh\" ]]; then",
+                        "  \"${BIN_DIR}/build-administration.sh\"",
                         "fi",
                         "",
-                        "# build storefront",
-                        "[[ ${SHOPWARE_SKIP_BUNDLE_DUMP} ]] || \"${BIN_TOOL}\" bundle:dump",
-                        "",
-                        "if [[ $(command -v jq) ]]; then",
-                        "    OLDPWD=$(pwd)",
-                        "    cd \"$PROJECT_ROOT\" || exit",
-                        "",
-                        "    jq -c '.[]' \"var/plugins.json\" | while read -r config; do",
-                        "        srcPath=$(echo \"$config\" | jq -r '(.basePath + .storefront.path)')",
-                        "",
-                        "        # the package.json files are always one upper",
-                        "        path=$(dirname \"$srcPath\")",
-                        "        name=$(echo \"$config\" | jq -r '.technicalName' )",
-                        "",
-                        "        if [[ -f \"$path/package.json\" && ! -f \"$path/node_modules\" && $name != \"storefront\" ]]; then",
-                        "            echo \"=> Installing npm dependencies for ${name}\"",
-                        "",
-                        "            if [[ -f \"$path/package-lock.json\" ]]; then",
-                        "                npm clean-install --prefix \"$path\"",
-                        "            else",
-                        "                npm install --prefix \"$path\"",
-                        "            fi",
-                        "        fi",
-                        "    done",
-                        "    cd \"$OLDPWD\" || exit",
-                        "else",
-                        "    echo \"Cannot check extensions for required npm installations as jq is not installed\"",
-                        "fi",
-                        "",
-                        "npm --prefix \"${STOREFRONT_ROOT}\"/Resources/app/storefront clean-install",
-                        "node \"${STOREFRONT_ROOT}\"/Resources/app/storefront/copy-to-vendor.js",
-                        "npm --prefix \"${STOREFRONT_ROOT}\"/Resources/app/storefront run production",
-                        "[[ ${SHOPWARE_SKIP_ASSET_COPY} ]] ||\"${BIN_TOOL}\" asset:install",
-                        "[[ ${SHOPWARE_SKIP_THEME_COMPILE} ]] || \"${BIN_TOOL}\" theme:compile",
-                        ""
+                        "if [[ -e \"${BIN_DIR}/build-storefront.sh\" ]]; then",
+                        "  \"${BIN_DIR}/build-storefront.sh\"",
+                        "fi"
                     ],
                     "executable": true
                 },
@@ -367,49 +281,6 @@
                         "",
                         "$application = new Application($kernel->getKernel());",
                         "$application->run($input);",
-                        ""
-                    ],
-                    "executable": true
-                },
-                "bin/watch-administration.sh": {
-                    "contents": [
-                        "#!/usr/bin/env bash",
-                        "",
-                        "CWD=\"$(cd -P -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd -P)\"",
-                        "",
-                        "export PROJECT_ROOT=\"${PROJECT_ROOT:-\"$(dirname \"$CWD\")\"}\"",
-                        "export ENV_FILE=${ENV_FILE:-\"${PROJECT_ROOT}/.env\"}",
-                        "",
-                        "source \"${ENV_FILE}\"",
-                        "export HOST=${HOST:-\"localhost\"}",
-                        "export ESLINT_DISABLE",
-                        "export PORT",
-                        "export APP_URL",
-                        "",
-                        "bin/console feature:dump || true",
-                        "",
-                        "npm run --prefix vendor/shopware/administration/Resources/app/administration/ dev",
-                        ""
-                    ],
-                    "executable": true
-                },
-                "bin/watch-storefront.sh": {
-                    "contents": [
-                        "#!/usr/bin/env bash",
-                        "",
-                        "CWD=\"$(cd -P -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd -P)\"",
-                        "",
-                        "export PROJECT_ROOT=\"${PROJECT_ROOT:-\"$(dirname \"$CWD\")\"}\"",
-                        "export ENV_FILE=${ENV_FILE:-\"${PROJECT_ROOT}/.env\"}",
-                        "",
-                        "source \"${ENV_FILE}\"",
-                        "export APP_URL",
-                        "export STOREFRONT_PROXY_PORT",
-                        "export ESLINT_DISABLE",
-                        "",
-                        "\"${CWD}\"/console theme:compile",
-                        "\"${CWD}\"/console theme:dump",
-                        "npm --prefix vendor/shopware/storefront/Resources/app/storefront/ run-script hot-proxy",
                         ""
                     ],
                     "executable": true
@@ -937,7 +808,7 @@
                     "executable": false
                 }
             },
-            "ref": "843f7cc9f40d11cda31e79a53719e419b15f7f16"
+            "ref": "aa6432c7257de756134d5c9e297663ced02e3db6"
         }
     }
 }

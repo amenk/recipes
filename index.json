@@ -1,7 +1,16 @@
 {
     "aliases": [],
     "recipes": {
+        "shopware/administration": [
+            "6.4"
+        ],
         "shopware/core": [
+            "6.4"
+        ],
+        "shopware/elasticsearch": [
+            "6.4"
+        ],
+        "shopware/storefront": [
             "6.4"
         ]
     },
