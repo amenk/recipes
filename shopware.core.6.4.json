@@ -1,0 +1,15 @@
+{
+    "manifests": {
+        "shopware/core": {
+            "manifest": {
+                "bundles": {
+                    "Shopware\\Core\\Framework\\Framework": [
+                        "all"
+                    ]
+                }
+            },
+            "files": [],
+            "ref": "bfa9de3100ec8edad9885f48db507ce172f48399"
+        }
+    }
+}

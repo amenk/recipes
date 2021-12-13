@@ -1,0 +1,16 @@
+{
+    "aliases": [],
+    "recipes": {
+        "shopware/core": [
+            "6.4"
+        ]
+    },
+    "versions": [],
+    "branch": "main",
+    "is_contrib": true,
+    "_links": {
+        "repository": "github.com/FriendsOfShopware/recipes",
+        "origin_template": "{package}:{version}@github.com/FriendsOfShopware/recipes:main",
+        "recipe_template": "https://raw.githubusercontent.com/FriendsOfShopware/recipes/flex/main/{package_dotted}.{version}.json"
+    }
+}

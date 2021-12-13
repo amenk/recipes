@@ -1,5 +1,0 @@
-{
-  "bundles": {
-    "Shopware\\Core\\Framework\\Framework": ["all"]
-  }
-}
