@@ -1,5 +1,7 @@
 {
-    "aliases": [],
+    "aliases": {
+        "console": "symfony/console"
+    },
     "recipes": {
         "shopware/administration": [
             "6.4"
