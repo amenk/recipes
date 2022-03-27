@@ -22,6 +22,7 @@
             "5.4"
         ]
     },
+    "recipe-conflicts": [],
     "versions": [],
     "branch": "main",
     "is_contrib": true,
@@ -29,6 +30,8 @@
         "repository": "github.com/FriendsOfShopware/recipes",
         "origin_template": "{package}:{version}@github.com/FriendsOfShopware/recipes:main",
         "recipe_template": "https://raw.githubusercontent.com/FriendsOfShopware/recipes/flex/main/{package_dotted}.{version}.json",
-        "archived_recipes_template": "https://raw.githubusercontent.com/FriendsOfShopware/recipes/flex/main/archived/{package_dotted}/{ref}.json"
+        "recipe_template_relative": "{package_dotted}.{version}.json",
+        "archived_recipes_template": "https://raw.githubusercontent.com/FriendsOfShopware/recipes/flex/main/archived/{package_dotted}/{ref}.json",
+        "archived_recipes_template_relative": "archived/{package_dotted}/{ref}.json"
     }
 }
