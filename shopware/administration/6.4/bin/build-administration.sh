@@ -2,6 +2,9 @@
 
 CWD="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
+
+# this is new
+
 set -euo pipefail
 
 export PROJECT_ROOT="${PROJECT_ROOT:-"$(dirname "$CWD")"}"
